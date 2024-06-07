@@ -34,6 +34,8 @@ close_tutorial.click()
 
 time.sleep(0.5)
 
+print("entered lobby")
+
 players = driver.find_elements(by=By.ID, value="gm1-player-")
 while (not len(players)):
     time.sleep(0.5)
@@ -47,6 +49,8 @@ for i in range(len(players)):
         button.click()
         players = driver.find_elements(by=By.ID, value="gm1-player-")
 
+print("challenged available players")
+
 superpower = driver.find_element(by=By.ID, value="choose-superpower")
 chat_full = driver.find_element(by=By.ID, value="chat-history-full")
 chat = driver.find_element(by=By.ID, value="chat-history")
@@ -59,6 +63,8 @@ while(not superpower.is_displayed()):
         if "PIayer" in challenges[i].text:
             buttons[2 * i].click()
             break
+
+print("in arena")
 
 arrow_keys = [Keys.ARROW_UP, Keys.ARROW_DOWN, Keys.ARROW_LEFT, Keys.ARROW_RIGHT]
 move_dirx = 0
