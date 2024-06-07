@@ -90,7 +90,7 @@ while(not chat_full.is_displayed()):
         ActionChains(driver).key_down(Keys.ARROW_LEFT).perform()
     if (move_dirx == 2):
         ActionChains(driver).key_down(Keys.ARROW_RIGHT).perform()
-    ActionChains(driver).click_and_hold(arena_canvas).perform()
+    ActionChains(driver).move_to_element_with_offset(arena_canvas, 0, 10).click_and_hold().perform() #distance right and down
     time.sleep(0.05)
     driver.save_screenshot(f'{i}.png')
     i += 1
