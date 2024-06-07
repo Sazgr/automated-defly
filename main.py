@@ -37,6 +37,7 @@ time.sleep(0.5)
 
 players = driver.find_elements(by=By.ID, value="gm1-player-")
 while (not len(players)):
+    time.sleep(0.5)
     players = driver.find_elements(by=By.ID, value="gm1-player-")
 for player in players:
     print(player.text)
