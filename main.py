@@ -14,11 +14,10 @@ opts.page_load_strategy = 'eager'
 driver = webdriver.Chrome(options = opts)
 
 #driver.get("https://defly.io")
-#driver.get("https://defly.io/#4-use4:3004")
-driver.get("https://defly.io/#4-eu1:3004")
+driver.get("https://defly.io/#4-use4:3004")
+#driver.get("https://defly.io/#4-eu1:3004")
 
 driver.implicitly_wait(0)
-
 
 username = driver.find_elements(by=By.ID, value="username")
 while not len(username) or not username[0].is_displayed():
@@ -39,22 +38,28 @@ players = driver.find_elements(by=By.ID, value="gm1-player-")
 while (not len(players)):
     time.sleep(0.5)
     players = driver.find_elements(by=By.ID, value="gm1-player-")
-for player in players:
-    print(player.text)
-    if (player.text[:8] != "PIayer42" and player.text[:8] == "PIayer28"):
-        player.click()
+
+for i in range(len(players)):
+    if (False and players[i].text[:8] != "PIayer42" and players[i].text[:6] == "PIayer"):
+        players[i].click()
         challenge_text = driver.find_element(by=By.ID, value="gm-1v1-confirm-duel")
-        print(challenge_text.text)
         button = challenge_text.find_element(by=By.CLASS_NAME, value="button")
-        print(button.text)
         button.click()
-        break
+        players = driver.find_elements(by=By.ID, value="gm1-player-")
 
 superpower = driver.find_element(by=By.ID, value="choose-superpower")
 chat_full = driver.find_element(by=By.ID, value="chat-history-full")
 chat = driver.find_element(by=By.ID, value="chat-history")
 while(not superpower.is_displayed()):
-    time.sleep(0.5)
+    time.sleep(1)
+    challenge_list = driver.find_element(by=By.ID, value="gm-1v1-duel-list");
+    challenges = challenge_list.find_elements(by=By.CLASS_NAME, value="duel-text")
+    buttons = challenge_list.find_elements(by=By.CLASS_NAME, value="button")
+    for i in range(len(challenges)):
+        if "PIayer" in challenges[i].text:
+            buttons[2 * i].click()
+            break
+
 arrow_keys = [Keys.ARROW_UP, Keys.ARROW_DOWN, Keys.ARROW_LEFT, Keys.ARROW_RIGHT]
 move_dirx = 0
 move_diry = 0
@@ -65,6 +70,7 @@ canvas_all = driver.find_elements(by=By.TAG_NAME, value="canvas")
 arena_canvas = canvas_all[-1]
 
 ActionChains(driver).send_keys("11111111222222223333333344444444").perform() #get upgrades
+
 i = 0
 while(not chat_full.is_displayed()):
     ActionChains(driver).key_up(Keys.ARROW_UP).key_up(Keys.ARROW_DOWN).key_up(Keys.ARROW_LEFT).key_up(Keys.ARROW_RIGHT).perform()
@@ -82,5 +88,7 @@ while(not chat_full.is_displayed()):
     time.sleep(0.05)
     driver.save_screenshot(f'{i}.png')
     i += 1
+
+#process chat_full.text to determine whether 1v1 was won or lost
 
 driver.quit()
