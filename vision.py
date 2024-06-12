@@ -33,3 +33,27 @@ def screenshot(hwnd):
     win32gui.ReleaseDC(hwnd, hwndDC)
 
     return img
+
+def remove_bar(image):
+    cropped = image[-1264 :, :]
+
+    return cropped
+
+def crop_and_downsize(image, target_height, target_width, downsize_ratio):
+    height, width = image.shape[:2]
+    hmin = height // 2 - target_height // 2
+    wmin = width // 2 - target_width // 2
+
+    cropped = image[hmin : hmin + target_height : downsize_ratio, wmin : wmin + target_width : downsize_ratio]
+
+    return cropped
+
+def process(image):
+    hsv = cv2.cvtColor(image[:, :, :3], cv2.COLOR_BGR2HSV) #convert rgba image to hsv
+    height, width = image.shape[:2]
+
+    for i in range(height):
+        for j in range(width):
+            if hsv[i][j][1] >= 64 and hsv[i][j][2] >= 32 and (hsv[i][j][0] < 110 or hsv[i][j][0] > 120): #not own pixel, probably enemy
+                hsv[i][j][0] = 0
+    return hsv

@@ -30,6 +30,10 @@ while not len(username) or not username[0].is_displayed():
     time.sleep(0.5)
     username = driver.find_elements(by=By.ID, value="username")
 username[0].send_keys("PIayer42") #change username
+driver.find_element(by=By.ID, value="skin-button").click()
+divs = driver.find_element(by=By.ID, value="color-list").find_elements(by=By.TAG_NAME, value="div")
+divs[-11].click() #get blue color
+driver.find_element(by=By.ID, value="skin-popup").find_element(by=By.CLASS_NAME, value="close-button").click()
 driver.find_element(by=By.ID, value="gamemode-4").click() #click button for 1v1 mode
 driver.find_element(by=By.ID, value="play-button").click() #click play
 
@@ -126,7 +130,16 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     else:
         ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, random.randint(-40, 40), random.randint(-40, 40)).release().context_click().click_and_hold().perform()
     img = vision.screenshot(hwnd)
-    cv2.imwrite(f"ss\{i}.png", img)
+    img_nobar = vision.remove_bar(img)
+    img_large = vision.crop_and_downsize(img_nobar, 800, 800, 8)
+    img_detail = vision.crop_and_downsize(img_nobar, 200, 200, 2)
+    hsv_large = vision.process(img_large)
+    hsv_detail = vision.process(img_detail)
+    img_large = cv2.cvtColor(hsv_large, cv2.COLOR_HSV2BGR)
+    img_detail = cv2.cvtColor(hsv_detail, cv2.COLOR_HSV2BGR)
+    cv2.imwrite(f"processed/1/large/{i}.png", img_large)
+    cv2.imwrite(f"processed/1/detail/{i}.png", img_detail)
+    #cv2.imwrite(f"ss\{i}.png", img)
     end = time.time()
     print("fps:", 1.0 / (end - start))
     i += 1
