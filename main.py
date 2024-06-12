@@ -82,7 +82,11 @@ arena_canvas = canvas_all[-1]
 while(not arena_canvas.is_displayed()):
     time.sleep(0.5)
 
-ActionChains(driver).send_keys("11111111222222223333333344444444").perform() #get upgrades
+shoot_only = True
+if shoot_only:
+    ActionChains(driver).send_keys("11111111222222223333333344444444").perform() #get upgrades
+else:
+    ActionChains(driver).send_keys("11111111222222224444444455555555").perform() #get upgrades
 
 #find window and prepare for screenshotting
 hwnd = None
@@ -111,7 +115,10 @@ while(arena_canvas.is_displayed()):
         ActionChains(driver, duration=0).key_up(Keys.ARROW_UP).key_up(Keys.ARROW_DOWN).perform()
     if (move_diry == 1):
         ActionChains(driver, duration=0).key_up(Keys.ARROW_UP).key_down(Keys.ARROW_DOWN).perform()
-    ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, random.randint(-40, 40), random.randint(-40, 40)).click_and_hold().perform() #distance right and down
+    if (shoot_only):
+        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, random.randint(-40, 40), random.randint(-40, 40)).click_and_hold().perform() #distance right and down
+    else:
+        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, random.randint(-40, 40), random.randint(-40, 40)).release().context_click().click_and_hold().perform()
     img = vision.screenshot(hwnd)
     cv2.imwrite(f"ss\{i}.png", img)
     end = time.time()
