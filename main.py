@@ -90,6 +90,8 @@ arena_canvas = canvas_all[-1]
 while(not arena_canvas.is_displayed()):
     time.sleep(0.5)
 
+time.sleep(0.5) #sleep more to wait for transition to finishs
+
 shoot_only = True
 if shoot_only:
     ActionChains(driver).send_keys("11111111222222223333333344444444").perform() #get upgrades
