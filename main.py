@@ -75,11 +75,12 @@ print("in arena")
 arrow_keys = [Keys.ARROW_UP, Keys.ARROW_DOWN, Keys.ARROW_LEFT, Keys.ARROW_RIGHT]
 move_dirx = 0
 move_diry = 0
-while(chat_full.is_displayed()):
-    time.sleep(0.5)
 
 canvas_all = driver.find_elements(by=By.TAG_NAME, value="canvas")
 arena_canvas = canvas_all[-1]
+
+while(not arena_canvas.is_displayed()):
+    time.sleep(0.5)
 
 ActionChains(driver).send_keys("11111111222222223333333344444444").perform() #get upgrades
 
@@ -88,34 +89,33 @@ hwnd = None
 def find_chrome_handle(this_hwnd, unused):
     global hwnd
     if win32gui.IsWindowVisible(this_hwnd) and 'Chrome' in win32gui.GetWindowText(this_hwnd):
-            hwnd = this_hwnd
+        hwnd = this_hwnd
 win32gui.EnumWindows(find_chrome_handle, None)
 
 windll.user32.SetProcessDPIAware()
 
 i = 0
-while(not chat_full.is_displayed()):
-    ActionChains(driver).key_up(Keys.ARROW_UP).key_up(Keys.ARROW_DOWN).key_up(Keys.ARROW_LEFT).key_up(Keys.ARROW_RIGHT).perform()
-    move_dirx = random.randint(0, 2)
-    move_diry = random.randint(0, 2)
-    if (move_diry == 1):
-        ActionChains(driver).key_down(Keys.ARROW_UP).perform()
-    if (move_diry == 2):
-        ActionChains(driver).key_down(Keys.ARROW_DOWN).perform()
-    if (move_dirx == 1):
-        ActionChains(driver).key_down(Keys.ARROW_LEFT).perform()
-    if (move_dirx == 2):
-        ActionChains(driver).key_down(Keys.ARROW_RIGHT).perform()
-    ActionChains(driver).move_to_element_with_offset(arena_canvas, random.randint(-40, 40), random.randint(-40, 40)).perform() #distance right and down
-    if (random.randint(0, 3) == 0):
-        ActionChains(driver).key_down(Keys.SPACE).perform()
-    else:
-        ActionChains(driver).click_and_hold().perform()
+while(arena_canvas.is_displayed()):
     start = time.time()
+    move_dirx = random.randint(-1, 1)
+    move_diry = random.randint(-1, 1)
+    if (move_dirx == -1):
+        ActionChains(driver, duration=0).key_down(Keys.ARROW_LEFT).key_up(Keys.ARROW_RIGHT).perform()
+    if (move_dirx == 0):
+        ActionChains(driver, duration=0).key_up(Keys.ARROW_LEFT).key_up(Keys.ARROW_RIGHT).perform()
+    if (move_dirx == 1):
+        ActionChains(driver, duration=0).key_up(Keys.ARROW_LEFT).key_down(Keys.ARROW_RIGHT).perform()
+    if (move_diry == -1):
+        ActionChains(driver, duration=0).key_down(Keys.ARROW_UP).key_up(Keys.ARROW_DOWN).perform()
+    if (move_diry == 0):
+        ActionChains(driver, duration=0).key_up(Keys.ARROW_UP).key_up(Keys.ARROW_DOWN).perform()
+    if (move_diry == 1):
+        ActionChains(driver, duration=0).key_up(Keys.ARROW_UP).key_down(Keys.ARROW_DOWN).perform()
+    ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, random.randint(-40, 40), random.randint(-40, 40)).click_and_hold().perform() #distance right and down
     img = vision.screenshot(hwnd)
     cv2.imwrite(f"ss\{i}.png", img)
     end = time.time()
-    print(end - start)
+    print("fps:", 1.0 / (end - start))
     i += 1
 
 #process chat_full.text to determine whether 1v1 was won or lost
