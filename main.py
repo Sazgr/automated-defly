@@ -92,7 +92,7 @@ while(not arena_canvas.is_displayed()):
 
 time.sleep(0.5) #sleep more to wait for transition to finishs
 
-shoot_only = True
+shoot_only = False
 if shoot_only:
     ActionChains(driver).send_keys("11111111222222223333333344444444").perform() #get upgrades
 else:
@@ -113,24 +113,28 @@ result_block = driver.find_element(by=By.ID, value="gm-1v1-result")
 i = 0
 while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     start = time.time()
-    move_dirx = random.randint(-1, 1)
-    move_diry = random.randint(-1, 1)
-    if (move_dirx == -1):
+    move_x = random.randint(-1, 1)
+    move_y = random.randint(-1, 1)
+    cursor_x = random.randint(-60, 60)
+    cursor_y = random.randint(-60, 60)
+    if (move_x == -1):
         ActionChains(driver, duration=0).key_down(Keys.ARROW_LEFT).key_up(Keys.ARROW_RIGHT).perform()
-    if (move_dirx == 0):
+    if (move_x == 0):
         ActionChains(driver, duration=0).key_up(Keys.ARROW_LEFT).key_up(Keys.ARROW_RIGHT).perform()
-    if (move_dirx == 1):
+    if (move_x == 1):
         ActionChains(driver, duration=0).key_up(Keys.ARROW_LEFT).key_down(Keys.ARROW_RIGHT).perform()
-    if (move_diry == -1):
+    if (move_y == -1):
         ActionChains(driver, duration=0).key_down(Keys.ARROW_UP).key_up(Keys.ARROW_DOWN).perform()
-    if (move_diry == 0):
+    if (move_y == 0):
         ActionChains(driver, duration=0).key_up(Keys.ARROW_UP).key_up(Keys.ARROW_DOWN).perform()
-    if (move_diry == 1):
+    if (move_y == 1):
         ActionChains(driver, duration=0).key_up(Keys.ARROW_UP).key_down(Keys.ARROW_DOWN).perform()
     if (shoot_only):
-        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, random.randint(-40, 40), random.randint(-40, 40)).click_and_hold().perform() #distance right and down
+        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).click_and_hold().perform() #distance right and down
+    elif i % 2 == 0:
+        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).release().key_down(Keys.SPACE).perform()
     else:
-        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, random.randint(-40, 40), random.randint(-40, 40)).release().context_click().click_and_hold().perform()
+        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).key_up(Keys.SPACE).click_and_hold().perform()
     img = vision.screenshot(hwnd)
     img_nobar = vision.remove_bar(img)
     img_large = vision.crop_and_downsize(img_nobar, 800, 800, 8)
@@ -141,6 +145,8 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     img_detail = cv2.cvtColor(hsv_detail, cv2.COLOR_HSV2BGR)
     cv2.imwrite(f"processed/1/large/{i}.png", img_large)
     cv2.imwrite(f"processed/1/detail/{i}.png", img_detail)
+    with open("actions/1.txt", "a") as data_file:
+        data_file.write(str(move_x) + " " + str(move_y) + " " + str(cursor_x) + " " + str(cursor_y) + "\n")
     #cv2.imwrite(f"ss\{i}.png", img)
     end = time.time()
     print("fps:", 1.0 / (end - start))
