@@ -60,7 +60,10 @@ print("challenged available players")
 superpower = driver.find_element(by=By.ID, value="choose-superpower")
 chat_full = driver.find_element(by=By.ID, value="chat-history-full")
 chat = driver.find_element(by=By.ID, value="chat-history")
+challenge_accepted = False
 while(not superpower.is_displayed()):
+    if challenge_accepted:
+        break
     time.sleep(0.5)
     challenge_list = driver.find_element(by=By.ID, value="gm-1v1-duel-list");
     challenges = challenge_list.find_elements(by=By.CLASS_NAME, value="duel-text")
@@ -68,6 +71,7 @@ while(not superpower.is_displayed()):
     for i in range(len(challenges)):
         if "PIayer" in challenges[i].text:
             buttons[2 * i].click()
+            challenge_accepted = True
             break
 
 print("in arena")
@@ -98,8 +102,10 @@ win32gui.EnumWindows(find_chrome_handle, None)
 
 windll.user32.SetProcessDPIAware()
 
+result_block = driver.find_element(by=By.ID, value="gm-1v1-result")
+
 i = 0
-while(arena_canvas.is_displayed()):
+while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     start = time.time()
     move_dirx = random.randint(-1, 1)
     move_diry = random.randint(-1, 1)
@@ -125,6 +131,10 @@ while(arena_canvas.is_displayed()):
     print("fps:", 1.0 / (end - start))
     i += 1
 
-#process chat_full.text to determine whether 1v1 was won or lost
+result_text = result_block.find_element(by=By.ID, value="gm-1v1-result-title").text
+if result_text[:8] == "You lost":
+    print("I lost the 1v1")
+else:
+    print("I won the 1v1")
 
 driver.quit()
