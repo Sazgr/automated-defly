@@ -86,7 +86,7 @@ while(not superpower.is_displayed()):
 
 print("in arena")
 
-id = str(now.year) + str(now.month) + str(now.day) + str(now.hour) + str(now.minute) + str(now.second)
+id = f"{now.year:04}{now.month:02}{now.day:02}{now.hour:02}{now.minute:02}{now.second:02}"
 os.makedirs(f"data/{id}/images/large")
 os.makedirs(f"data/{id}/images/detail")
 
@@ -181,8 +181,10 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
 
 result_text = result_block.find_element(by=By.ID, value="gm-1v1-result-title").text
 if result_text[:8] == "You lost":
-    print("I lost the 1v1")
+    with open(f"data/{id}/actions.txt", "a") as data_file:
+        data_file.write("0\n")
 else:
-    print("I won the 1v1")
+    with open(f"data/{id}/actions.txt", "a") as data_file:
+        data_file.write("1\n")
 
 driver.quit()
