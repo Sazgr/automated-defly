@@ -125,10 +125,17 @@ hsv_detail_prev = None;
 hsv_large = None;
 hsv_detail = None;
 
+with open(f"data/{id}/log.txt", "a") as data_file:
+    data_file.write("timestep screenshot process evaluate move save\n")
+
 i = 0
 while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     start = time.time()
     img = vision.screenshot(hwnd)
+    end = time.time()
+    with open(f"data/{id}/log.txt", "a") as data_file:
+        data_file.write(f"{i} {end - start} ")
+    start = end
     img_nobar = vision.remove_bar(img)
     img_large = vision.crop_and_downsize(img_nobar, 800, 800, 8)
     img_detail = vision.crop_and_downsize(img_nobar, 200, 200, 2)
@@ -144,12 +151,20 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     data = data.float()
     data /= 256.0
     data = data.unsqueeze(0)
+    end = time.time()
+    with open(f"data/{id}/log.txt", "a") as data_file:
+        data_file.write(f"{end - start} ")
+    start = end
     action = nn.model(data)
     action = action[0]
     move_x = round(action[0].item())
     move_y = round(action[1].item())
     cursor_x = action[2].item() * 100
     cursor_y = action[3].item() * 100
+    end = time.time()
+    with open(f"data/{id}/log.txt", "a") as data_file:
+        data_file.write(f"{end - start} ")
+    start = end
     if (move_x == -1):
         ActionChains(driver, duration=0).key_down(Keys.ARROW_LEFT).key_up(Keys.ARROW_RIGHT).perform()
     if (move_x == 0):
@@ -168,6 +183,10 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
         ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).release().key_down(Keys.SPACE).perform()
     else:
         ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).key_up(Keys.SPACE).click_and_hold().perform()
+    end = time.time()
+    with open(f"data/{id}/log.txt", "a") as data_file:
+        data_file.write(f"{end - start} ")
+    start = end
     img_large = cv2.cvtColor(hsv_large, cv2.COLOR_HSV2BGR)
     img_detail = cv2.cvtColor(hsv_detail, cv2.COLOR_HSV2BGR)
     cv2.imwrite(f"data/{id}/images/large/{i}.png", img_large)
@@ -176,7 +195,8 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
         data_file.write(str(move_x) + " " + str(move_y) + " " + str(cursor_x) + " " + str(cursor_y) + "\n")
     #cv2.imwrite(f"ss\{i}.png", img)
     end = time.time()
-    print("fps:", 1.0 / (end - start))
+    with open(f"data/{id}/log.txt", "a") as data_file:
+        data_file.write(f"{end - start}\n")
     i += 1
 
 result_text = result_block.find_element(by=By.ID, value="gm-1v1-result-title").text
