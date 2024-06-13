@@ -12,7 +12,6 @@ model = nn.Sequential(
     nn.ReLU(),
     nn.MaxPool2d(2, padding=1),
     nn.Flatten(),
-    nn.Flatten(),
     nn.Linear(4 * 13 * 13, 64),
     nn.ReLU(), 
     nn.Linear(64, 4)
