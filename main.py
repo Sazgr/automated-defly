@@ -12,6 +12,10 @@ import cv2
 import nn
 import numpy as np
 from ctypes import windll
+import datetime
+import os
+
+now = datetime.datetime.now()
 
 #print("cuda available to torch: ", torch.cuda.is_available())
 
@@ -81,6 +85,10 @@ while(not superpower.is_displayed()):
             break
 
 print("in arena")
+
+id = str(now.year) + str(now.month) + str(now.day) + str(now.hour) + str(now.minute) + str(now.second)
+os.makedirs(f"data/{id}/images/large")
+os.makedirs(f"data/{id}/images/detail")
 
 arrow_keys = [Keys.ARROW_UP, Keys.ARROW_DOWN, Keys.ARROW_LEFT, Keys.ARROW_RIGHT]
 move_dirx = 0
@@ -162,9 +170,9 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
         ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).key_up(Keys.SPACE).click_and_hold().perform()
     img_large = cv2.cvtColor(hsv_large, cv2.COLOR_HSV2BGR)
     img_detail = cv2.cvtColor(hsv_detail, cv2.COLOR_HSV2BGR)
-    cv2.imwrite(f"processed/1/large/{i}.png", img_large)
-    cv2.imwrite(f"processed/1/detail/{i}.png", img_detail)
-    with open("actions/1.txt", "a") as data_file:
+    cv2.imwrite(f"data/{id}/images/large/{i}.png", img_large)
+    cv2.imwrite(f"data/{id}/images/detail/{i}.png", img_detail)
+    with open(f"data/{id}/actions.txt", "a") as data_file:
         data_file.write(str(move_x) + " " + str(move_y) + " " + str(cursor_x) + " " + str(cursor_y) + "\n")
     #cv2.imwrite(f"ss\{i}.png", img)
     end = time.time()
