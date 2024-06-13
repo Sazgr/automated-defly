@@ -1,3 +1,5 @@
 # Executables
 *.exe
+
 __pycache__/
+data/
