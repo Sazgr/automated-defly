@@ -9,6 +9,8 @@ import torch
 import random
 import win32gui
 import cv2
+import nn
+import numpy as np
 from ctypes import windll
 
 #print("cuda available to torch: ", torch.cuda.is_available())
@@ -92,7 +94,7 @@ while(not arena_canvas.is_displayed()):
 
 time.sleep(0.5) #sleep more to wait for transition to finishs
 
-shoot_only = False
+shoot_only = True
 if shoot_only:
     ActionChains(driver).send_keys("11111111222222223333333344444444").perform() #get upgrades
 else:
@@ -110,13 +112,36 @@ windll.user32.SetProcessDPIAware()
 
 result_block = driver.find_element(by=By.ID, value="gm-1v1-result")
 
+hsv_large_prev = None;
+hsv_detail_prev = None;
+hsv_large = None;
+hsv_detail = None;
+
 i = 0
 while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     start = time.time()
-    move_x = random.randint(-1, 1)
-    move_y = random.randint(-1, 1)
-    cursor_x = random.randint(-60, 60)
-    cursor_y = random.randint(-60, 60)
+    img = vision.screenshot(hwnd)
+    img_nobar = vision.remove_bar(img)
+    img_large = vision.crop_and_downsize(img_nobar, 800, 800, 8)
+    img_detail = vision.crop_and_downsize(img_nobar, 200, 200, 2)
+    hsv_large_prev = hsv_large
+    hsv_detail_prev = hsv_detail
+    hsv_large = vision.process(img_large)
+    hsv_detail = vision.process(img_detail)
+    if i == 0:
+        hsv_large_prev = hsv_large
+        hsv_detail_prev = hsv_detail
+    data = torch.from_numpy(np.concatenate((hsv_large_prev, hsv_detail_prev, hsv_large, hsv_detail), axis=2))
+    data = data.permute(2, 0, 1)
+    data = data.float()
+    data /= 256.0
+    data = data.unsqueeze(0)
+    action = nn.model(data)
+    action = action[0]
+    move_x = round(action[0].item())
+    move_y = round(action[1].item())
+    cursor_x = action[2].item() * 100
+    cursor_y = action[3].item() * 100
     if (move_x == -1):
         ActionChains(driver, duration=0).key_down(Keys.ARROW_LEFT).key_up(Keys.ARROW_RIGHT).perform()
     if (move_x == 0):
@@ -135,12 +160,6 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
         ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).release().key_down(Keys.SPACE).perform()
     else:
         ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).key_up(Keys.SPACE).click_and_hold().perform()
-    img = vision.screenshot(hwnd)
-    img_nobar = vision.remove_bar(img)
-    img_large = vision.crop_and_downsize(img_nobar, 800, 800, 8)
-    img_detail = vision.crop_and_downsize(img_nobar, 200, 200, 2)
-    hsv_large = vision.process(img_large)
-    hsv_detail = vision.process(img_detail)
     img_large = cv2.cvtColor(hsv_large, cv2.COLOR_HSV2BGR)
     img_detail = cv2.cvtColor(hsv_detail, cv2.COLOR_HSV2BGR)
     cv2.imwrite(f"processed/1/large/{i}.png", img_large)
