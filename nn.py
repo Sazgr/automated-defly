@@ -15,4 +15,5 @@ model = nn.Sequential(
     nn.Linear(4 * 16 * 16, 64),
     nn.ReLU(), 
     nn.Linear(64, 4)
+    nn.Tanh()
 )
