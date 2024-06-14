@@ -97,10 +97,10 @@ move_diry = 0
 canvas_all = driver.find_elements(by=By.TAG_NAME, value="canvas")
 arena_canvas = canvas_all[-1]
 
-while(not arena_canvas.is_displayed()):
+while(not superpower.is_displayed()):
     time.sleep(0.5)
-
-time.sleep(0.5) #sleep more to wait for transition to finishs
+superpower.find_element(by=By.TAG_NAME, value="tbody").find_elements(by=By.TAG_NAME, value="tr")[1].find_elements(by=By.TAG_NAME, value="td")[3].click()
+#order of superpowers: dual fire, speed boost, clone, shield, flashbang, teleport
 
 shoot_only = True
 if shoot_only:
