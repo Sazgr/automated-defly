@@ -10,9 +10,9 @@ model = nn.Sequential(
     nn.MaxPool2d(2),
     nn.Conv2d(32, 4, kernel_size=3, padding=1),
     nn.ReLU(),
-    nn.MaxPool2d(2, padding=1),
+    nn.MaxPool2d(2),
     nn.Flatten(),
-    nn.Linear(4 * 13 * 13, 64),
+    nn.Linear(4 * 16 * 16, 64),
     nn.ReLU(), 
     nn.Linear(64, 4)
 )
