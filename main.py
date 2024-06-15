@@ -157,8 +157,8 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     start = end
     action = model.model(data)
     action = action[0]
-    move_x = round(action[0].item())
-    move_y = round(action[1].item())
+    move_x = int(action[0].item() > 0) - int(action[1].item() > 0)
+    move_y = int(action[2].item() > 0) - int(action[3].item() > 0)
     cursor_x = action[2].item() * 100
     cursor_y = action[3].item() * 100
     end = time.time()
@@ -192,7 +192,7 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     cv2.imwrite(f"data/{id}/images/large/{i}.png", img_large)
     cv2.imwrite(f"data/{id}/images/detail/{i}.png", img_detail)
     with open(f"data/{id}/actions.txt", "a") as data_file:
-        data_file.write(str(move_x) + " " + str(move_y) + " " + str(cursor_x) + " " + str(cursor_y) + "\n")
+        data_file.write(' '.join(str(x.item) for x in action) + "\n")
     #cv2.imwrite(f"ss\{i}.png", img)
     end = time.time()
     with open(f"data/{id}/log.txt", "a") as data_file:
