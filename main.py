@@ -9,7 +9,7 @@ import torch
 import random
 import win32gui
 import cv2
-import nn
+import model
 import numpy as np
 from ctypes import windll
 import datetime
@@ -155,7 +155,7 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     with open(f"data/{id}/log.txt", "a") as data_file:
         data_file.write(f"{end - start} ")
     start = end
-    action = nn.model(data)
+    action = model.model(data)
     action = action[0]
     move_x = round(action[0].item())
     move_y = round(action[1].item())
