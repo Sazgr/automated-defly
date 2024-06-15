@@ -192,7 +192,7 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     cv2.imwrite(f"data/{id}/images/large/{i}.png", img_large)
     cv2.imwrite(f"data/{id}/images/detail/{i}.png", img_detail)
     with open(f"data/{id}/actions.txt", "a") as data_file:
-        data_file.write(' '.join(str(x.item) for x in action) + "\n")
+        data_file.write(' '.join(str(x.item()) for x in action) + "\n")
     #cv2.imwrite(f"ss\{i}.png", img)
     end = time.time()
     with open(f"data/{id}/log.txt", "a") as data_file:
