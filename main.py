@@ -163,8 +163,8 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     action = action[0]
     move_x = int(action[0].item() > 0) - int(action[1].item() > 0)
     move_y = int(action[2].item() > 0) - int(action[3].item() > 0)
-    cursor_x = action[2].item() * 100
-    cursor_y = action[3].item() * 100
+    cursor_x = action[4].item() * 100
+    cursor_y = action[5].item() * 100
     end = time.time()
     with open(f"data/{id}/log.txt", "a") as data_file:
         data_file.write(f"{end - start} ")
