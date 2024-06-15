@@ -9,6 +9,7 @@ import torch
 import random
 import win32gui
 import cv2
+import pickle
 import model
 import numpy as np
 from ctypes import windll
@@ -89,6 +90,7 @@ print("in arena")
 id = f"{now.year:04}{now.month:02}{now.day:02}{now.hour:02}{now.minute:02}{now.second:02}"
 os.makedirs(f"data/{id}/images/large")
 os.makedirs(f"data/{id}/images/detail")
+os.makedirs(f"data/{id}/states")
 
 arrow_keys = [Keys.ARROW_UP, Keys.ARROW_DOWN, Keys.ARROW_LEFT, Keys.ARROW_RIGHT]
 move_dirx = 0
@@ -150,6 +152,8 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     data = data.permute(2, 0, 1)
     data = data.float()
     data /= 256.0
+    with open(f"data/{id}/states/{i}.pkl", "wb") as pickle_file:
+        pickle.dump(data, pickle_file)
     data = data.unsqueeze(0)
     end = time.time()
     with open(f"data/{id}/log.txt", "a") as data_file:
