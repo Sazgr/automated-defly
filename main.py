@@ -205,10 +205,13 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
 
 result_text = result_block.find_element(by=By.ID, value="gm-1v1-result-title").text
 if result_text[:8] == "You lost":
-    with open(f"data/{id}/actions.txt", "a") as data_file:
+    with open(f"data/{id}/result.txt", "a") as data_file:
         data_file.write("0\n")
 else:
-    with open(f"data/{id}/actions.txt", "a") as data_file:
+    with open(f"data/{id}/result.txt", "a") as data_file:
         data_file.write("1\n")
+
+with open(f"data/{id}/length.txt", "a") as data_file:
+    data_file.write(f"{i}\n")
 
 driver.quit()
