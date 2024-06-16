@@ -50,6 +50,31 @@ def create_dataset():
     with open(f"dataset.pkl", "wb") as pickle_file:
         pickle.dump(dataset, pickle_file)
 
-def load_dataset(dataset):
+def load_dataset():
     with open(f"dataset.pkl", "rb") as pickle_file:
         dataset = pickle.dump(pickle_file)
+
+    return dataset
+
+def create_batch(dataset, batch_size):
+    state0_batch = []
+    action_batch = []
+    reward_batch = []
+    state1_batch = []
+    terminal_batch = []
+    dataset_size = length(dataset)
+    for i in range(batch_size):
+        id = random.randint(0, dataset_size - 1)
+        state0_batch.append(dataset[id]["state0"])
+        action_batch.append(dataset[id]["action"])
+        reward_batch.append(dataset[id]["reward"])
+        state1_batch.append(dataset[id]["state1"])
+        terminal_batch.append(0.0 if dataset[id]["terminal"] else 1.0)
+
+        state0_batch = np.array(state0_batch).reshape(batch_size, -1)
+        action_batch = np.array(action_batch).reshape(batch_size, -1)
+        reward_batch = np.array(reward_batch).reshape(batch_size, -1)
+        state1_batch = np.array(state1_batch).reshape(batch_size, -1)
+        terminal_batch = np.array(terminal_batch).reshape(batch_size, -1)
+
+        return state0_batch, action_batch, reward_batch, state1_batch, terminal_batch
