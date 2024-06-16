@@ -12,6 +12,7 @@ import cv2
 import pickle
 import model
 import numpy as np
+from noise import OrnsteinUhlenbeckProcess
 from ctypes import windll
 import datetime
 import os
@@ -130,6 +131,9 @@ hsv_detail = None;
 with open(f"data/{id}/log.txt", "a") as data_file:
     data_file.write("timestep screenshot process evaluate move save\n")
 
+is_training = True
+epsilon = 1.0
+ou_process = OrnsteinUhlenbeckProcess()
 i = 0
 while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     start = time.time()
@@ -159,12 +163,14 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     with open(f"data/{id}/log.txt", "a") as data_file:
         data_file.write(f"{end - start} ")
     start = end
-    action = model.model(data)
-    action = action[0]
-    move_x = int(action[0].item() > 0) - int(action[1].item() > 0)
-    move_y = int(action[2].item() > 0) - int(action[3].item() > 0)
-    cursor_x = action[4].item() * 100
-    cursor_y = action[5].item() * 100
+    action = model.model(data).detach().numpy().squeeze(0)
+    action += int(is_training) * epsilon * ou_process.sample()
+    action = np.clip(action, -1., 1.)
+    move_x = int(action[0] > 0) - int(action[1] > 0)
+    move_y = int(action[2] > 0) - int(action[3] > 0)
+    cursor_x = action[4] * 100
+    cursor_y = action[5] * 100
+    build = action[6] > 0
     end = time.time()
     with open(f"data/{id}/log.txt", "a") as data_file:
         data_file.write(f"{end - start} ")
@@ -181,10 +187,12 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
         ActionChains(driver, duration=0).key_up(Keys.ARROW_UP).key_up(Keys.ARROW_DOWN).perform()
     if (move_y == 1):
         ActionChains(driver, duration=0).key_up(Keys.ARROW_UP).key_down(Keys.ARROW_DOWN).perform()
-    if (shoot_only):
+    if (shoot_only and not build):
         ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).click_and_hold().perform() #distance right and down
+    elif build:
+        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).release().key_down(Keys.SPACE).key_up(Keys.SPACE).perform()
     elif i % 2 == 0:
-        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).release().key_down(Keys.SPACE).perform()
+        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).release().key_down(Keys.SPACE).key_up(Keys.SPACE).perform()
     else:
         ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).key_up(Keys.SPACE).click_and_hold().perform()
     end = time.time()
@@ -196,7 +204,7 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     cv2.imwrite(f"data/{id}/images/large/{i}.png", img_large)
     cv2.imwrite(f"data/{id}/images/detail/{i}.png", img_detail)
     with open(f"data/{id}/actions.txt", "a") as data_file:
-        data_file.write(' '.join(str(x.item()) for x in action) + "\n")
+        data_file.write(' '.join(str(x) for x in action) + "\n")
     #cv2.imwrite(f"ss\{i}.png", img)
     end = time.time()
     with open(f"data/{id}/log.txt", "a") as data_file:
