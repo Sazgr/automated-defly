@@ -4,5 +4,9 @@
 # Shared libraries
 *.so
 
+# Pickle files
+*.pkl
+
+# Folders
 __pycache__/
 data/
