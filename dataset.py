@@ -27,10 +27,8 @@ def create_dataset():
 
             reward = 0
 
-            if terminal and result == 1:
-                reward += 1000
-            elif terminal and result == 0:
-                reward -= 1000
+            if terminal:
+                reward += (1000 if result == 1 else -1000)
 
             if action[6] > 0:
                 reward -= 30
