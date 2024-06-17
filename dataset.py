@@ -12,7 +12,7 @@ def create_dataset():
         with open(f"data/{episode}/result.txt", "r") as result_file:
             result = int(result_file.read())
 
-        if length < 40:
+        if length < 45:
             continue
 
         action_file = open(f"data/{episode}/actions.txt")
@@ -28,18 +28,23 @@ def create_dataset():
             reward = 0
 
             if terminal:
-                reward += (1000 if result == 1 else -1000)
-
-            if action[6] > 0:
-                reward -= 30
+                reward += (2000 if result == 1 else -2000)
 
             img = cv2.imread(f"data/{episode}/images/large/{i}.png")
             img = vision.crop_and_downsize(img, 100, 100, 1)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+            own_pixels = 0
+            enemy_pixels = 0
+
             for j in range(100):
                 for k in range(100):
                     if img[j][k][1] >= 64 and img[j][k][2] >= 32 and img[j][k][0] == 0:
-                        reward += 1
+                        enemy_pixels += 1
+                    if img[j][k][1] >= 64 and img[j][k][2] >= 32 and (img[j][k][0] > 110 and img[j][k][0] < 120):
+                        own_pixels += 1
+
+            reward += min(enemy_pixels, 40) #reward agent for going towards and being able to see enemy
+            reward -= 0.25 * max(own_pixels - 50, 0) #penalize agent for building too many walls
 
             data_point = {"state0" : state0_path, "action" : action, "reward" : reward, "state1" : state1_path, "terminal" : terminal}
             dataset.append(data_point)
@@ -82,3 +87,5 @@ def create_batch(dataset, batch_size):
         terminal_batch = np.array(terminal_batch).reshape(batch_size, -1)
 
         return state0_batch, action_batch, reward_batch, state1_batch, terminal_batch
+
+create_dataset()
