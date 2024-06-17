@@ -60,7 +60,7 @@ while (not len(players)):
     players = driver.find_elements(by=By.ID, value="gm1-player-")
 
 for i in range(len(players)):
-    if (False and players[i].text[:8] != "PIayer42" and players[i].text[:6] == "PIayer"):
+    if (players[i].text[:8] != "PIayer42" and players[i].text[:6] == "PIayer"):
         players[i].click()
         challenge_text = driver.find_element(by=By.ID, value="gm-1v1-confirm-duel")
         button = challenge_text.find_element(by=By.CLASS_NAME, value="button")
