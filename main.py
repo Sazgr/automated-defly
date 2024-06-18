@@ -244,7 +244,7 @@ while True:
         if result_text[:8] == "You lost":
             with open(f"data/{id}/result.txt", "a") as data_file:
                 data_file.write("0\n")
-        elif result_text[:8] == "You defeated":
+        elif result_text[:8] == "You defe":
             with open(f"data/{id}/result.txt", "a") as data_file:
                 data_file.write("1\n")
 
