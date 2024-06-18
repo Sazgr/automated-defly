@@ -76,6 +76,8 @@ while True:
 
         player_name = navigate_to_lobby(driver)
 
+    window_title_id = random.randint(0, 99999999)
+    driver.execute_script(f'document.title = "{window_title_id:08}"')
     players = driver.find_elements(by=By.ID, value="gm1-player-")
     while (not len(players)):
         time.sleep(0.5)
@@ -138,7 +140,7 @@ while True:
     hwnd = None
     def find_chrome_handle(this_hwnd, unused):
         global hwnd
-        if win32gui.IsWindowVisible(this_hwnd) and 'Chrome' in win32gui.GetWindowText(this_hwnd):
+        if win32gui.IsWindowVisible(this_hwnd) and str(window_title_id) in win32gui.GetWindowText(this_hwnd):
             hwnd = this_hwnd
     win32gui.EnumWindows(find_chrome_handle, None)
 
