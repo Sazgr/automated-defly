@@ -17,6 +17,10 @@ from ctypes import windll
 import datetime
 import os
 
+model = model.Actor()
+
+model.load_state_dict(torch.load(f'nets/actor200.pkl'))
+
 now = datetime.datetime.now()
 
 #print("cuda available to torch: ", torch.cuda.is_available())
@@ -33,11 +37,13 @@ driver.get("https://defly.io/#4-use4:3004")
 #driver.set_window_size(800, 600)
 driver.implicitly_wait(0)
 
+player_name = "PIayer" + str(random.randint(10, 99))
+
 username = driver.find_elements(by=By.ID, value="username")
 while not len(username) or not username[0].is_displayed():
     time.sleep(0.5)
     username = driver.find_elements(by=By.ID, value="username")
-username[0].send_keys("PIayer42") #change username
+username[0].send_keys(player_name) #change username
 driver.find_element(by=By.ID, value="skin-button").click()
 divs = driver.find_element(by=By.ID, value="color-list").find_elements(by=By.TAG_NAME, value="div")
 divs[-11].click() #get blue color
@@ -60,7 +66,7 @@ while (not len(players)):
     players = driver.find_elements(by=By.ID, value="gm1-player-")
 
 for i in range(len(players)):
-    if (players[i].text[:8] != "PIayer42" and players[i].text[:6] == "PIayer"):
+    if (players[i].text[:8] != player_name and players[i].text[:6] == "PIayer"):
         players[i].click()
         challenge_text = driver.find_element(by=By.ID, value="gm-1v1-confirm-duel")
         button = challenge_text.find_element(by=By.CLASS_NAME, value="button")
@@ -163,7 +169,7 @@ while(arena_canvas.is_displayed() and not result_block.is_displayed()):
     with open(f"data/{id}/log.txt", "a") as data_file:
         data_file.write(f"{end - start} ")
     start = end
-    action = model.model(data).detach().numpy().squeeze(0)
+    action = model(data).detach().numpy().squeeze(0)
     action += int(is_training) * epsilon * ou_process.sample()
     action = np.clip(action, -1., 1.)
     move_x = int(action[0] > 0) - int(action[1] > 0)
