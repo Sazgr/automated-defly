@@ -19,7 +19,7 @@ import os
 
 model = model.Actor()
 
-model.load_state_dict(torch.load(f'nets/actor100.pkl'))
+model.load_state_dict(torch.load(f'nets/actor200.pkl'))
 
 #print("cuda available to torch: ", torch.cuda.is_available())
 
@@ -216,17 +216,26 @@ while True:
         with open(f"data/{id}/log.txt", "a") as data_file:
             data_file.write(f"{end - start}\n")
         i += 1
+        if i >= 1200:
+            break
 
-    result_text = result_block.find_element(by=By.ID, value="gm-1v1-result-title").text
-    if result_text[:8] == "You lost":
+    if i >= 1000:
         with open(f"data/{id}/result.txt", "a") as data_file:
-            data_file.write("0\n")
+            data_file.write("2\n")
     else:
-        with open(f"data/{id}/result.txt", "a") as data_file:
-            data_file.write("1\n")
+        result_text = result_block.find_element(by=By.ID, value="gm-1v1-result-title").text
+        if result_text[:8] == "You lost":
+            with open(f"data/{id}/result.txt", "a") as data_file:
+                data_file.write("0\n")
+        elif result_text[:8] == "You defeated":
+            with open(f"data/{id}/result.txt", "a") as data_file:
+                data_file.write("1\n")
 
     with open(f"data/{id}/length.txt", "a") as data_file:
         data_file.write(f"{i}\n")
+
+    if i >= 1000:
+        driver.quit()
 
     continue_button = driver.find_element(by=By.ID, value="gm-1v1-button-continue")
     continue_button.click()
