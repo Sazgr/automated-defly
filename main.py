@@ -65,9 +65,8 @@ while True:
     while driver.current_url == "https://defly.io/":
         time.sleep(0.5)
 
-    print("entered lobby")
-
     while not driver.current_url == "https://defly.io/#4-use4:3004":
+        print("entered incorrect lobby, retrying, url:", driver.current_url)
         driver.quit()
         driver = webdriver.Chrome(options = opts)
 
@@ -75,6 +74,11 @@ while True:
         driver.implicitly_wait(0)
 
         player_name = navigate_to_lobby(driver)
+
+        while driver.current_url == "https://defly.io/":
+            time.sleep(0.5)
+
+    print("entered lobby")
 
     window_title_id = random.randint(0, 99999999)
     driver.execute_script(f'document.title = "{window_title_id:08}"')
