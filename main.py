@@ -19,9 +19,7 @@ import os
 
 model = model.Actor()
 
-model.load_state_dict(torch.load(f'nets/actor200.pkl'))
-
-now = datetime.datetime.now()
+model.load_state_dict(torch.load(f'nets/actor100.pkl'))
 
 #print("cuda available to torch: ", torch.cuda.is_available())
 
@@ -60,172 +58,187 @@ time.sleep(0.5)
 
 print("entered lobby")
 
-players = driver.find_elements(by=By.ID, value="gm1-player-")
-while (not len(players)):
-    time.sleep(0.5)
+while True:
     players = driver.find_elements(by=By.ID, value="gm1-player-")
-
-for i in range(len(players)):
-    if (players[i].text[:8] != player_name and players[i].text[:6] == "PIayer"):
-        players[i].click()
-        challenge_text = driver.find_element(by=By.ID, value="gm-1v1-confirm-duel")
-        button = challenge_text.find_element(by=By.CLASS_NAME, value="button")
-        button.click()
+    while (not len(players)):
+        time.sleep(0.5)
         players = driver.find_elements(by=By.ID, value="gm1-player-")
 
-print("challenged available players")
+    for i in range(len(players)):
+        if (players[i].text[:8] != player_name and players[i].text[:6] == "PIayer"):
+            players[i].click()
+            challenge_text = driver.find_element(by=By.ID, value="gm-1v1-confirm-duel")
+            button = challenge_text.find_element(by=By.CLASS_NAME, value="button")
+            button.click()
+            players = driver.find_elements(by=By.ID, value="gm1-player-")
 
-superpower = driver.find_element(by=By.ID, value="choose-superpower")
-chat_full = driver.find_element(by=By.ID, value="chat-history-full")
-chat = driver.find_element(by=By.ID, value="chat-history")
-challenge_accepted = False
-while(not superpower.is_displayed()):
-    if challenge_accepted:
-        break
-    time.sleep(0.5)
-    challenge_list = driver.find_element(by=By.ID, value="gm-1v1-duel-list");
-    challenges = challenge_list.find_elements(by=By.CLASS_NAME, value="duel-text")
-    buttons = challenge_list.find_elements(by=By.CLASS_NAME, value="button")
-    for i in range(len(challenges)):
-        if "PIayer" in challenges[i].text:
-            buttons[2 * i].click()
-            challenge_accepted = True
+    print("challenged available players")
+
+    superpower = driver.find_element(by=By.ID, value="choose-superpower")
+    chat_full = driver.find_element(by=By.ID, value="chat-history-full")
+    chat = driver.find_element(by=By.ID, value="chat-history")
+    challenge_accepted = False
+    while(not superpower.is_displayed()):
+        if challenge_accepted:
             break
+        time.sleep(0.5)
+        challenge_list = driver.find_element(by=By.ID, value="gm-1v1-duel-list");
+        challenges = challenge_list.find_elements(by=By.CLASS_NAME, value="duel-text")
+        buttons = challenge_list.find_elements(by=By.CLASS_NAME, value="button")
+        for i in range(len(challenges)):
+            if "PIayer" in challenges[i].text:
+                buttons[2 * i].click()
+                challenge_accepted = True
+                break
 
-print("in arena")
+    print("in arena")
 
-id = f"{now.year:04}{now.month:02}{now.day:02}{now.hour:02}{now.minute:02}{now.second:02}"
-os.makedirs(f"data/{id}/images/large")
-os.makedirs(f"data/{id}/images/detail")
-os.makedirs(f"data/{id}/states")
+    now = datetime.datetime.now()
+    id = f"{now.year:04}{now.month:02}{now.day:02}{now.hour:02}{now.minute:02}{now.second:02}"
+    os.makedirs(f"data/{id}/images/large")
+    os.makedirs(f"data/{id}/images/detail")
+    os.makedirs(f"data/{id}/states")
 
-arrow_keys = [Keys.ARROW_UP, Keys.ARROW_DOWN, Keys.ARROW_LEFT, Keys.ARROW_RIGHT]
-move_dirx = 0
-move_diry = 0
+    arrow_keys = [Keys.ARROW_UP, Keys.ARROW_DOWN, Keys.ARROW_LEFT, Keys.ARROW_RIGHT]
+    move_dirx = 0
+    move_diry = 0
 
-canvas_all = driver.find_elements(by=By.TAG_NAME, value="canvas")
-arena_canvas = canvas_all[-1]
+    canvas_all = driver.find_elements(by=By.TAG_NAME, value="canvas")
+    arena_canvas = canvas_all[-1]
 
-while(not superpower.is_displayed()):
-    time.sleep(0.5)
-superpower.find_element(by=By.TAG_NAME, value="tbody").find_elements(by=By.TAG_NAME, value="tr")[1].find_elements(by=By.TAG_NAME, value="td")[3].click()
-#order of superpowers: dual fire, speed boost, clone, shield, flashbang, teleport
+    while(not superpower.is_displayed()):
+        time.sleep(0.5)
+    superpower.find_element(by=By.TAG_NAME, value="tbody").find_elements(by=By.TAG_NAME, value="tr")[1].find_elements(by=By.TAG_NAME, value="td")[3].click()
+    #order of superpowers: dual fire, speed boost, clone, shield, flashbang, teleport
 
-shoot_only = True
-if shoot_only:
-    ActionChains(driver).send_keys("11111111222222223333333344444444").perform() #get upgrades
-else:
-    ActionChains(driver).send_keys("11111111222222224444444455555555").perform() #get upgrades
+    shoot_only = True
+    if shoot_only:
+        ActionChains(driver).send_keys("11111111222222223333333344444444").perform() #get upgrades
+    else:
+        ActionChains(driver).send_keys("11111111222222224444444455555555").perform() #get upgrades
 
-#find window and prepare for screenshotting
-hwnd = None
-def find_chrome_handle(this_hwnd, unused):
-    global hwnd
-    if win32gui.IsWindowVisible(this_hwnd) and 'Chrome' in win32gui.GetWindowText(this_hwnd):
-        hwnd = this_hwnd
-win32gui.EnumWindows(find_chrome_handle, None)
+    #find window and prepare for screenshotting
+    hwnd = None
+    def find_chrome_handle(this_hwnd, unused):
+        global hwnd
+        if win32gui.IsWindowVisible(this_hwnd) and 'Chrome' in win32gui.GetWindowText(this_hwnd):
+            hwnd = this_hwnd
+    win32gui.EnumWindows(find_chrome_handle, None)
 
-windll.user32.SetProcessDPIAware()
+    windll.user32.SetProcessDPIAware()
 
-result_block = driver.find_element(by=By.ID, value="gm-1v1-result")
+    result_block = driver.find_element(by=By.ID, value="gm-1v1-result")
 
-hsv_large_prev = None;
-hsv_detail_prev = None;
-hsv_large = None;
-hsv_detail = None;
+    hsv_large_prev = None;
+    hsv_detail_prev = None;
+    hsv_large = None;
+    hsv_detail = None;
 
-with open(f"data/{id}/log.txt", "a") as data_file:
-    data_file.write("timestep screenshot process evaluate move save\n")
-
-is_training = True
-epsilon = 1.0
-ou_process = OrnsteinUhlenbeckProcess()
-i = 0
-while(arena_canvas.is_displayed() and not result_block.is_displayed()):
-    start = time.time()
-    img = vision.screenshot(hwnd)
-    end = time.time()
     with open(f"data/{id}/log.txt", "a") as data_file:
-        data_file.write(f"{i} {end - start} ")
-    start = end
-    img_nobar = vision.remove_bar(img)
-    img_large = vision.crop_and_downsize(img_nobar, 1024, 1024, 8)
-    img_detail = vision.crop_and_downsize(img_nobar, 256, 256, 2)
-    hsv_large_prev = hsv_large
-    hsv_detail_prev = hsv_detail
-    hsv_large = vision.process(img_large)
-    hsv_detail = vision.process(img_detail)
-    if i == 0:
+        data_file.write("timestep screenshot process evaluate move save\n")
+
+    is_training = True
+    epsilon = 1.0
+    ou_process = OrnsteinUhlenbeckProcess()
+    i = 0
+    while(arena_canvas.is_displayed() and not result_block.is_displayed()):
+        start = time.time()
+        img = vision.screenshot(hwnd)
+        end = time.time()
+        with open(f"data/{id}/log.txt", "a") as data_file:
+            data_file.write(f"{i} {end - start} ")
+        start = end
+        img_nobar = vision.remove_bar(img)
+        img_large = vision.crop_and_downsize(img_nobar, 1024, 1024, 8)
+        img_detail = vision.crop_and_downsize(img_nobar, 256, 256, 2)
         hsv_large_prev = hsv_large
         hsv_detail_prev = hsv_detail
-    data = torch.from_numpy(np.concatenate((hsv_large_prev, hsv_detail_prev, hsv_large, hsv_detail), axis=2))
-    data = data.permute(2, 0, 1)
-    data = data.float()
-    data /= 256.0
-    with open(f"data/{id}/states/{i}.pkl", "wb") as pickle_file:
-        pickle.dump(data, pickle_file)
-    data = data.unsqueeze(0)
-    end = time.time()
-    with open(f"data/{id}/log.txt", "a") as data_file:
-        data_file.write(f"{end - start} ")
-    start = end
-    action = model(data).detach().numpy().squeeze(0)
-    action += int(is_training) * epsilon * ou_process.sample()
-    action = np.clip(action, -1., 1.)
-    move_x = int(action[0] > 0) - int(action[1] > 0)
-    move_y = int(action[2] > 0) - int(action[3] > 0)
-    cursor_x = action[4] * 100
-    cursor_y = action[5] * 100
-    build = action[6] > 0
-    end = time.time()
-    with open(f"data/{id}/log.txt", "a") as data_file:
-        data_file.write(f"{end - start} ")
-    start = end
-    if (move_x == -1):
-        ActionChains(driver, duration=0).key_down(Keys.ARROW_LEFT).key_up(Keys.ARROW_RIGHT).perform()
-    if (move_x == 0):
-        ActionChains(driver, duration=0).key_up(Keys.ARROW_LEFT).key_up(Keys.ARROW_RIGHT).perform()
-    if (move_x == 1):
-        ActionChains(driver, duration=0).key_up(Keys.ARROW_LEFT).key_down(Keys.ARROW_RIGHT).perform()
-    if (move_y == -1):
-        ActionChains(driver, duration=0).key_down(Keys.ARROW_UP).key_up(Keys.ARROW_DOWN).perform()
-    if (move_y == 0):
-        ActionChains(driver, duration=0).key_up(Keys.ARROW_UP).key_up(Keys.ARROW_DOWN).perform()
-    if (move_y == 1):
-        ActionChains(driver, duration=0).key_up(Keys.ARROW_UP).key_down(Keys.ARROW_DOWN).perform()
-    if (shoot_only and not build):
-        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).click_and_hold().perform() #distance right and down
-    elif build:
-        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).release().key_down(Keys.SPACE).key_up(Keys.SPACE).perform()
-    elif i % 2 == 0:
-        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).release().key_down(Keys.SPACE).key_up(Keys.SPACE).perform()
+        hsv_large = vision.process(img_large)
+        hsv_detail = vision.process(img_detail)
+        if i == 0:
+            hsv_large_prev = hsv_large
+            hsv_detail_prev = hsv_detail
+        data = torch.from_numpy(np.concatenate((hsv_large_prev, hsv_detail_prev, hsv_large, hsv_detail), axis=2))
+        data = data.permute(2, 0, 1)
+        data = data.float()
+        data /= 256.0
+        with open(f"data/{id}/states/{i}.pkl", "wb") as pickle_file:
+            pickle.dump(data, pickle_file)
+        data = data.unsqueeze(0)
+        end = time.time()
+        with open(f"data/{id}/log.txt", "a") as data_file:
+            data_file.write(f"{end - start} ")
+        start = end
+        action = model(data).detach().numpy().squeeze(0)
+        action += int(is_training) * epsilon * ou_process.sample()
+        action = np.clip(action, -1., 1.)
+        move_x = int(action[0] > 0) - int(action[1] > 0)
+        move_y = int(action[2] > 0) - int(action[3] > 0)
+        cursor_x = action[4] * 100
+        cursor_y = action[5] * 100
+        build = action[6] > 0
+        end = time.time()
+        with open(f"data/{id}/log.txt", "a") as data_file:
+            data_file.write(f"{end - start} ")
+        start = end
+        if (move_x == -1):
+            ActionChains(driver, duration=0).key_down(Keys.ARROW_LEFT).key_up(Keys.ARROW_RIGHT).perform()
+        if (move_x == 0):
+            ActionChains(driver, duration=0).key_up(Keys.ARROW_LEFT).key_up(Keys.ARROW_RIGHT).perform()
+        if (move_x == 1):
+            ActionChains(driver, duration=0).key_up(Keys.ARROW_LEFT).key_down(Keys.ARROW_RIGHT).perform()
+        if (move_y == -1):
+            ActionChains(driver, duration=0).key_down(Keys.ARROW_UP).key_up(Keys.ARROW_DOWN).perform()
+        if (move_y == 0):
+            ActionChains(driver, duration=0).key_up(Keys.ARROW_UP).key_up(Keys.ARROW_DOWN).perform()
+        if (move_y == 1):
+            ActionChains(driver, duration=0).key_up(Keys.ARROW_UP).key_down(Keys.ARROW_DOWN).perform()
+        if (shoot_only and not build):
+            ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).click_and_hold().perform() #distance right and down
+        elif build:
+            ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).release().key_down(Keys.SPACE).key_up(Keys.SPACE).perform()
+        elif i % 2 == 0:
+            ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).release().key_down(Keys.SPACE).key_up(Keys.SPACE).perform()
+        else:
+            ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).key_up(Keys.SPACE).click_and_hold().perform()
+        end = time.time()
+        with open(f"data/{id}/log.txt", "a") as data_file:
+            data_file.write(f"{end - start} ")
+        start = end
+        img_large = cv2.cvtColor(hsv_large, cv2.COLOR_HSV2BGR)
+        img_detail = cv2.cvtColor(hsv_detail, cv2.COLOR_HSV2BGR)
+        cv2.imwrite(f"data/{id}/images/large/{i}.png", img_large)
+        cv2.imwrite(f"data/{id}/images/detail/{i}.png", img_detail)
+        with open(f"data/{id}/actions.txt", "a") as data_file:
+            data_file.write(' '.join(str(x) for x in action) + "\n")
+        #cv2.imwrite(f"ss\{i}.png", img)
+        end = time.time()
+        with open(f"data/{id}/log.txt", "a") as data_file:
+            data_file.write(f"{end - start}\n")
+        i += 1
+
+    result_text = result_block.find_element(by=By.ID, value="gm-1v1-result-title").text
+    if result_text[:8] == "You lost":
+        with open(f"data/{id}/result.txt", "a") as data_file:
+            data_file.write("0\n")
     else:
-        ActionChains(driver, duration=0).move_to_element_with_offset(arena_canvas, cursor_x, cursor_y).key_up(Keys.SPACE).click_and_hold().perform()
-    end = time.time()
-    with open(f"data/{id}/log.txt", "a") as data_file:
-        data_file.write(f"{end - start} ")
-    start = end
-    img_large = cv2.cvtColor(hsv_large, cv2.COLOR_HSV2BGR)
-    img_detail = cv2.cvtColor(hsv_detail, cv2.COLOR_HSV2BGR)
-    cv2.imwrite(f"data/{id}/images/large/{i}.png", img_large)
-    cv2.imwrite(f"data/{id}/images/detail/{i}.png", img_detail)
-    with open(f"data/{id}/actions.txt", "a") as data_file:
-        data_file.write(' '.join(str(x) for x in action) + "\n")
-    #cv2.imwrite(f"ss\{i}.png", img)
-    end = time.time()
-    with open(f"data/{id}/log.txt", "a") as data_file:
-        data_file.write(f"{end - start}\n")
-    i += 1
+        with open(f"data/{id}/result.txt", "a") as data_file:
+            data_file.write("1\n")
 
-result_text = result_block.find_element(by=By.ID, value="gm-1v1-result-title").text
-if result_text[:8] == "You lost":
-    with open(f"data/{id}/result.txt", "a") as data_file:
-        data_file.write("0\n")
-else:
-    with open(f"data/{id}/result.txt", "a") as data_file:
-        data_file.write("1\n")
+    with open(f"data/{id}/length.txt", "a") as data_file:
+        data_file.write(f"{i}\n")
 
-with open(f"data/{id}/length.txt", "a") as data_file:
-    data_file.write(f"{i}\n")
+    continue_button = driver.find_element(by=By.ID, value="gm-1v1-button-continue")
+    continue_button.click()
+
+    time.sleep(2)
+
+    while continue_button.is_displayed():
+        time.sleep(0.5)
+
+    time.sleep(2)
+
+    while not chat_full.is_displayed():
+        time.sleep(0.5)
 
 driver.quit()
