@@ -23,19 +23,7 @@ model.load_state_dict(torch.load(f'nets/actor200.pkl'))
 
 #print("cuda available to torch: ", torch.cuda.is_available())
 
-while True:
-    opts = Options()
-    #opts.add_argument('--headless')
-    opts.add_argument('--incognito')
-    opts.page_load_strategy = 'eager'
-    driver = webdriver.Chrome(options = opts)
-
-    #driver.get("https://defly.io")
-    driver.get("https://defly.io/#4-use4:3004")
-    #driver.get("https://defly.io/#4-eu1:3004")
-    #driver.set_window_size(800, 600)
-    driver.implicitly_wait(0)
-
+def navigate_to_lobby(driver):
     player_name = "PIayer" + str(random.randint(10, 99))
 
     username = driver.find_elements(by=By.ID, value="username")
@@ -57,7 +45,36 @@ while True:
 
     time.sleep(0.5)
 
+    return player_name
+
+while True:
+    opts = Options()
+    #opts.add_argument('--headless')
+    opts.add_argument('--incognito')
+    opts.page_load_strategy = 'eager'
+    driver = webdriver.Chrome(options = opts)
+
+    #driver.get("https://defly.io")
+    driver.get("https://defly.io/#4-use4:3004")
+    #driver.get("https://defly.io/#4-eu1:3004")
+    #driver.set_window_size(800, 600)
+    driver.implicitly_wait(0)
+
+    player_name = navigate_to_lobby(driver)
+
+    while driver.current_url == "https://defly.io/":
+        time.sleep(0.5)
+
     print("entered lobby")
+
+    while not driver.current_url == "https://defly.io/#4-use4:3004":
+        driver.quit()
+        driver = webdriver.Chrome(options = opts)
+
+        driver.get("https://defly.io/#4-use4:3004")
+        driver.implicitly_wait(0)
+
+        player_name = navigate_to_lobby(driver)
 
     players = driver.find_elements(by=By.ID, value="gm1-player-")
     while (not len(players)):
