@@ -23,42 +23,42 @@ model.load_state_dict(torch.load(f'nets/actor200.pkl'))
 
 #print("cuda available to torch: ", torch.cuda.is_available())
 
-opts = Options()
-#opts.add_argument('--headless')
-opts.add_argument('--incognito')
-opts.page_load_strategy = 'eager'
-driver = webdriver.Chrome(options = opts)
-
-#driver.get("https://defly.io")
-driver.get("https://defly.io/#4-use4:3004")
-#driver.get("https://defly.io/#4-eu1:3004")
-#driver.set_window_size(800, 600)
-driver.implicitly_wait(0)
-
-player_name = "PIayer" + str(random.randint(10, 99))
-
-username = driver.find_elements(by=By.ID, value="username")
-while not len(username) or not username[0].is_displayed():
-    time.sleep(0.5)
-    username = driver.find_elements(by=By.ID, value="username")
-username[0].send_keys(player_name) #change username
-driver.find_element(by=By.ID, value="skin-button").click()
-divs = driver.find_element(by=By.ID, value="color-list").find_elements(by=By.TAG_NAME, value="div")
-divs[-11].click() #get blue color
-driver.find_element(by=By.ID, value="skin-popup").find_element(by=By.CLASS_NAME, value="close-button").click()
-driver.find_element(by=By.ID, value="gamemode-4").click() #click button for 1v1 mode
-driver.find_element(by=By.ID, value="play-button").click() #click play
-
-close_tutorial = driver.find_element(by=By.ID, value="tuto-popup").find_element(by=By.CLASS_NAME, value="button")
-while (not close_tutorial.is_displayed()):
-    time.sleep(0.5)
-close_tutorial.click()
-
-time.sleep(0.5)
-
-print("entered lobby")
-
 while True:
+    opts = Options()
+    #opts.add_argument('--headless')
+    opts.add_argument('--incognito')
+    opts.page_load_strategy = 'eager'
+    driver = webdriver.Chrome(options = opts)
+
+    #driver.get("https://defly.io")
+    driver.get("https://defly.io/#4-use4:3004")
+    #driver.get("https://defly.io/#4-eu1:3004")
+    #driver.set_window_size(800, 600)
+    driver.implicitly_wait(0)
+
+    player_name = "PIayer" + str(random.randint(10, 99))
+
+    username = driver.find_elements(by=By.ID, value="username")
+    while not len(username) or not username[0].is_displayed():
+        time.sleep(0.5)
+        username = driver.find_elements(by=By.ID, value="username")
+    username[0].send_keys(player_name) #change username
+    driver.find_element(by=By.ID, value="skin-button").click()
+    divs = driver.find_element(by=By.ID, value="color-list").find_elements(by=By.TAG_NAME, value="div")
+    divs[-11].click() #get blue color
+    driver.find_element(by=By.ID, value="skin-popup").find_element(by=By.CLASS_NAME, value="close-button").click()
+    driver.find_element(by=By.ID, value="gamemode-4").click() #click button for 1v1 mode
+    driver.find_element(by=By.ID, value="play-button").click() #click play
+
+    close_tutorial = driver.find_element(by=By.ID, value="tuto-popup").find_element(by=By.CLASS_NAME, value="button")
+    while (not close_tutorial.is_displayed()):
+        time.sleep(0.5)
+    close_tutorial.click()
+
+    time.sleep(0.5)
+
+    print("entered lobby")
+
     players = driver.find_elements(by=By.ID, value="gm1-player-")
     while (not len(players)):
         time.sleep(0.5)
@@ -234,20 +234,4 @@ while True:
     with open(f"data/{id}/length.txt", "a") as data_file:
         data_file.write(f"{i}\n")
 
-    if i >= 1000:
-        driver.quit()
-
-    continue_button = driver.find_element(by=By.ID, value="gm-1v1-button-continue")
-    continue_button.click()
-
-    time.sleep(2)
-
-    while continue_button.is_displayed():
-        time.sleep(0.5)
-
-    time.sleep(2)
-
-    while not chat_full.is_displayed():
-        time.sleep(0.5)
-
-driver.quit()
+    driver.quit()
