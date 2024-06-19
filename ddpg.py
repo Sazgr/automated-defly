@@ -34,7 +34,7 @@ class DDPG(object):
         # Hyper-parameters
         self.batch_size = 64
         self.tau = 0.001
-        self.discount = 0.97
+        self.discount = 0.99
 
     def update_policy(self):
         state0_batch, action_batch, reward_batch, state1_batch, terminal_batch = dataset.create_batch(self.dataset, self.batch_size)
