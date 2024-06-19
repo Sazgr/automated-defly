@@ -95,14 +95,24 @@ def create_batch(dataset, batch_size):
     terminal_batch = []
     dataset_size = len(dataset)
     for i in range(batch_size):
+        augment_flip = random.randint(0, 1)
         id = random.randint(0, dataset_size - 1)
         with open(dataset[id]["state0"], "rb") as pickle_file:
-            state0 = pickle.load(pickle_file).numpy()
+            state0 = pickle.load(pickle_file).numpy().reshape(12, 128, 128)
+            if augment_flip:
+                np.flip(state0, axis=2)
         state0_batch.append(state0)
-        action_batch.append(np.array(dataset[id]["action"]))
+        action = np.array(dataset[id]["action"])
+        if augment_flip:
+            action[0], action[1] = action[1], action[0]
+            action[2], action[3] = action[3], action[2]
+            action[4] = -action[4]
+        action_batch.append(action)
         reward_batch.append(dataset[id]["reward"])
         with open(dataset[id]["state1"], "rb") as pickle_file:
-            state1 = pickle.load(pickle_file).numpy()
+            state1 = pickle.load(pickle_file).numpy().reshape(12, 128, 128)
+            if augment_flip:
+                np.flip(state1, axis=2)
         state1_batch.append(state1)
         terminal_batch.append(0.0 if dataset[id]["terminal"] else 1.0)
     state0_batch = np.array(state0_batch).reshape(batch_size, 12, 128, 128)
