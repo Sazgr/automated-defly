@@ -13,7 +13,7 @@ def create_dataset():
             dataset = pickle.load(pickle_file)
     except:
         print("previous dataset not found, creating new dataset")
-        dataset = {"data" : [], "info_latest" : "00000000000000"}
+        dataset = {"data" : [], "info_latest" : "00000000000000", "size" : 0}
 
     for episode in all_episodes:
         if episode <= dataset["info_latest"]:
@@ -41,7 +41,7 @@ def create_dataset():
             reward = 0
 
             if terminal:
-                reward += (2000 if result == 1 else -2000)
+                reward += (2000 if result == 1 else -2000 if result == 0 else -200)
 
             if (action[6] > 0):
                 reward -= 10 #penalize agent for not shooting
@@ -71,11 +71,12 @@ def create_dataset():
 
             data_point = {"state0" : state0_path, "action" : action, "reward" : reward, "state1" : state1_path, "terminal" : terminal}
             dataset["data"].append(data_point)
+            dataset["size"] += 1
 
         action_file.close()
         if (episode > dataset["info_latest"]):
             dataset["info_latest"] = episode
-        print(f"processed episode {episode}")
+        print(f"processed episode {episode}, dataset size is {dataset['size']}")
 
     with open(f"dataset.pkl", "wb") as pickle_file:
         pickle.dump(dataset, pickle_file)
