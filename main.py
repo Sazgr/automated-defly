@@ -107,10 +107,13 @@ while True:
         challenges = challenge_list.find_elements(by=By.CLASS_NAME, value="duel-text")
         buttons = challenge_list.find_elements(by=By.CLASS_NAME, value="button")
         for i in range(len(challenges)):
-            if "PIayer" in challenges[i].text:
-                buttons[2 * i].click()
-                challenge_accepted = True
-                break
+            try:
+                if "PIayer" in challenges[i].text:
+                    buttons[2 * i].click()
+                    challenge_accepted = True
+                    break
+            except:
+                continue
 
     print("in arena")
 
