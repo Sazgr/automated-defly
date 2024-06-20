@@ -19,8 +19,6 @@ import os
 
 model = model.Actor()
 
-model.load_state_dict(torch.load(f'nets/actor200.pkl'))
-
 #print("cuda available to torch: ", torch.cuda.is_available())
 
 def navigate_to_lobby(driver):
@@ -162,7 +160,7 @@ while True:
 
     is_training = True
     epsilon = 1.0
-    ou_process = OrnsteinUhlenbeckProcess()
+    ou_process = OrnsteinUhlenbeckProcess(size=4)
     i = 0
     while(arena_canvas.is_displayed() and not result_block.is_displayed()):
         start = time.time()
@@ -197,9 +195,10 @@ while True:
         action = np.clip(action, -1., 1.)
         move_x = int(action[0] > 0) - int(action[1] > 0)
         move_y = int(action[2] > 0) - int(action[3] > 0)
-        cursor_x = action[4] * 100
-        cursor_y = action[5] * 100
-        build = action[6] > 0
+        aim_x, aim_y = vision.aim(hsv_large)
+        cursor_x = int(float(aim_x) * 100)
+        cursor_y = int(float(aim_y) * 100)
+        build = 0
         end = time.time()
         with open(f"data/{id}/log.txt", "a") as data_file:
             data_file.write(f"{end - start} ")

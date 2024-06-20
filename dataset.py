@@ -41,10 +41,11 @@ def create_dataset():
             reward = 0
 
             if terminal:
-                reward += (2000 if result == 1 else -2000 if result == 0 else -200)
+                reward += (-2000 if result == 0 else 0)
+                #reward += (2000 if result == 1 else -2000 if result == 0 else -200)
 
-            if (action[6] > 0):
-                reward -= 10 #penalize agent for not shooting
+            if (int(action[0] > 0) - int(action[1] > 0) or int(action[2] > 0) - int(action[3] > 0)):
+                reward += 25 #moving is good
 
             img = cv2.imread(f"data/{episode}/images/large/{i}.png")
             img = vision.crop_and_downsize(img, 100, 100, 1)
@@ -63,8 +64,8 @@ def create_dataset():
                     if img[j][k][1] < 10 and img[j][k][2] < 80:
                         out_of_bound_pixels += 0.01 * ((50 - abs(j - 50)) + (50 - abs(k - 50)))
 
-            reward += 4 * min(enemy_pixels, 40) #reward agent for being near enemy
-            reward -= 0.25 * max(own_pixels - 50, 0) #penalize agent for building too many walls
+            reward += 6 * min(enemy_pixels, 40) #reward agent for being near enemy
+            #reward -= 0.25 * max(own_pixels - 50, 0) #penalize agent for building too many walls
             reward -= 0.1 * out_of_bound_pixels #penalize the agent for being too close to arena wall
 
             #print(reward) #for inspecting and debugging

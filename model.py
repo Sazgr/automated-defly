@@ -10,7 +10,7 @@ class Actor(nn.Module):
         self.conv3 = nn.Conv2d(32, 4, kernel_size=3, padding=1)
         self.flatten = nn.Flatten()
         self.fc1 = nn.Linear(4 * 16 * 16, 64)
-        self.fc2 = nn.Linear(64, 7)
+        self.fc2 = nn.Linear(64, 4)
 
     def forward(self, x):
         out = F.max_pool2d(torch.relu(self.conv1(x)), 2)
@@ -28,7 +28,7 @@ class Critic(nn.Module):
         self.conv2 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
         self.conv3 = nn.Conv2d(32, 4, kernel_size=3, padding=1)
         self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(4 * 16 * 16 + 7, 64)
+        self.fc1 = nn.Linear(4 * 16 * 16 + 4, 64)
         self.fc2 = nn.Linear(64, 1)
 
     def forward(self, xs):
