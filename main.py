@@ -196,6 +196,8 @@ while True:
         move_x = int(action[0] > 0) - int(action[1] > 0)
         move_y = int(action[2] > 0) - int(action[3] > 0)
         aim_x, aim_y = vision.aim(hsv_large)
+        aim_x = max(-1.0, min(aim_x, 1.0))
+        aim_y = max(-1.0, min(aim_y, 1.0))
         cursor_x = int(float(aim_x) * 100)
         cursor_y = int(float(aim_y) * 100)
         build = 0
