@@ -35,6 +35,7 @@ def create_dataset():
         for i in range(30, length - 12):
             state0_path = f"data/{episode}/states/{i}.pkl"
             action = [float(x) for x in action_file.readline().split()]
+            action = action[:4]
             state1_path = f"data/{episode}/states/{i + 1}.pkl"
             terminal = (i == length - 13)
 
