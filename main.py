@@ -19,7 +19,7 @@ import os
 
 model = model.Actor()
 
-model.load_state_dict(torch.load(f'nets/actor250.pkl'))
+#model.load_state_dict(torch.load(f'nets/actor250.pkl'))
 
 #print("cuda available to torch: ", torch.cuda.is_available())
 
@@ -132,6 +132,8 @@ while True:
     canvas_all = driver.find_elements(by=By.TAG_NAME, value="canvas")
     arena_canvas = canvas_all[-1]
 
+    fps_block = driver.find_element(by=By.ID, value="fps")
+
     while(not superpower.is_displayed()):
         time.sleep(0.5)
     superpower.find_element(by=By.TAG_NAME, value="tbody").find_elements(by=By.TAG_NAME, value="tr")[1].find_elements(by=By.TAG_NAME, value="td")[3].click()
@@ -167,6 +169,7 @@ while True:
     epsilon = 1.0
     ou_process = OrnsteinUhlenbeckProcess(size=6)
     i = 0
+    max_ping = 0
     while(arena_canvas.is_displayed() and not result_block.is_displayed()):
         start = time.time()
         img = vision.screenshot(hwnd)
@@ -233,6 +236,9 @@ while True:
         with open(f"data/{id}/log.txt", "a") as data_file:
             data_file.write(f"{end - start} ")
         start = end
+        fps_text = fps_block.text
+        ping = int(fps_text[fps_text.find("ping: ") + 6:])
+        max_ping = max(ping, max_ping)
         img_large = cv2.cvtColor(hsv_large, cv2.COLOR_HSV2BGR)
         img_detail = cv2.cvtColor(hsv_detail, cv2.COLOR_HSV2BGR)
         cv2.imwrite(f"data/{id}/images/large/{i}.png", img_large)
@@ -246,6 +252,9 @@ while True:
         i += 1
         if i >= 1200:
             break
+
+    with open(f"data/{id}/maxping.txt", "a") as data_file:
+        data_file.write(f"{max_ping}\n")
 
     if i >= 1000:
         with open(f"data/{id}/result.txt", "a") as data_file:
