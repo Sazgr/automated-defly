@@ -175,8 +175,8 @@ while True:
             data_file.write(f"{i} {end - start} ")
         start = end
         img_nobar = vision.remove_bar(img)
-        img_large = vision.crop_and_downsize(img_nobar, 1024, 1024, 8)
-        img_detail = vision.crop_and_downsize(img_nobar, 256, 256, 2)
+        img_large = vision.crop_and_downsize(img_nobar, 1024, 1536, 8)
+        img_detail = vision.crop_and_downsize(img_nobar, 256, 384, 2)
         hsv_large_prev = hsv_large
         hsv_detail_prev = hsv_detail
         hsv_large = vision.process(img_large)
