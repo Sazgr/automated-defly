@@ -106,8 +106,6 @@ def create_batch(dataset, batch_size):
         action = np.array(dataset[id]["action"])
         if augment_flip:
             action[0], action[1] = action[1], action[0]
-            action[2], action[3] = action[3], action[2]
-            action[4] = -action[4]
         action_batch.append(action)
         reward_batch.append(dataset[id]["reward"])
         with open(dataset[id]["state1"], "rb") as pickle_file:
