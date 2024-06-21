@@ -14,8 +14,8 @@ void aim(unsigned char* image, size_t height, size_t width, double* aim_x, doubl
         for (int j = 0; j < width; ++j) {
             if (image[3 * (i * width + j) + 1] >= 64 && image[3 * (i * width + j) + 2] >= 32 && image[3 * (i * width + j) + 0] == 0) {
                 ++enemy_pixels;
-                *aim_y += i - height / 2;
-                *aim_x += j - width / 2;
+                *aim_y += (i - (int)height / 2);
+                *aim_x += (j - (int)width / 2);
             }
         }
     }
