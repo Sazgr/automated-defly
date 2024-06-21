@@ -78,5 +78,4 @@ def aim(hsv):
     c_aim(hsv, height, width, ctypes.byref(aim_x), ctypes.byref(aim_y))
     aim_x.value = aim_x.value / (height / 2)
     aim_y.value = aim_y.value / (width / 2)
-    print(aim_x.value, aim_y.value)
     return aim_x.value, aim_y.value
