@@ -20,6 +20,12 @@ def create_dataset():
             print(f"skipped episode {episode}")
             continue
 
+        with open(f"data/{episode}/maxping.txt", "r") as ping_file:
+            max_ping = int(ping_file.read())
+        if max_ping > 500:
+            print(f"ping spike in episode {episode} of {max_ping}")
+            continue
+
         with open(f"data/{episode}/length.txt", "r") as length_file:
             length = int(length_file.read())
         with open(f"data/{episode}/result.txt", "r") as result_file:
@@ -100,7 +106,7 @@ def create_batch(dataset, batch_size):
         augment_flip = random.randint(0, 1)
         id = random.randint(0, dataset_size - 1)
         with open(dataset[id]["state0"], "rb") as pickle_file:
-            state0 = pickle.load(pickle_file).numpy().reshape(12, 128, 128)
+            state0 = pickle.load(pickle_file).numpy().reshape(12, 128, 192)
             if augment_flip:
                 np.flip(state0, axis=2)
         state0_batch.append(state0)
@@ -110,15 +116,15 @@ def create_batch(dataset, batch_size):
         action_batch.append(action)
         reward_batch.append(dataset[id]["reward"])
         with open(dataset[id]["state1"], "rb") as pickle_file:
-            state1 = pickle.load(pickle_file).numpy().reshape(12, 128, 128)
+            state1 = pickle.load(pickle_file).numpy().reshape(12, 128, 192)
             if augment_flip:
                 np.flip(state1, axis=2)
         state1_batch.append(state1)
         terminal_batch.append(0.0 if dataset[id]["terminal"] else 1.0)
-    state0_batch = np.array(state0_batch).reshape(batch_size, 12, 128, 128)
+    state0_batch = np.array(state0_batch).reshape(batch_size, 12, 128, 192)
     action_batch = np.array(action_batch).reshape(batch_size, -1)
     reward_batch = np.array(reward_batch).reshape(batch_size, -1)
-    state1_batch = np.array(state1_batch).reshape(batch_size, 12, 128, 128)
+    state1_batch = np.array(state1_batch).reshape(batch_size, 12, 128, 192)
     terminal_batch = np.array(terminal_batch).reshape(batch_size, -1)
 
     return state0_batch, action_batch, reward_batch, state1_batch, terminal_batch
