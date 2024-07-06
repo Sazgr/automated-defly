@@ -19,7 +19,7 @@ import os
 
 model = model.Actor()
 
-#model.load_state_dict(torch.load(f'nets/actor250.pkl'))
+#model.load_state_dict(torch.load(f'nets/actor500.pkl'))
 
 #print("cuda available to torch: ", torch.cuda.is_available())
 

@@ -48,32 +48,33 @@ def create_dataset():
             reward = 0
 
             if terminal:
-                reward += (-2000 if result == 0 else 0)
+                reward += (100 if result == 1 else -2000 if result == 0 else 0)
+
                 #reward += (2000 if result == 1 else -2000 if result == 0 else -200)
 
             if (int(action[0] > 0) - int(action[1] > 0) or int(action[2] > 0) - int(action[3] > 0)):
-                reward += 25 #moving is good
+                reward += 10 #moving is good
 
             img = cv2.imread(f"data/{episode}/images/large/{i}.png")
-            img = vision.crop_and_downsize(img, 100, 100, 1)
+            img = vision.crop_and_downsize(img, 128, 192, 1)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
             own_pixels = 0
             enemy_pixels = 0
             out_of_bound_pixels = 0
 
-            for j in range(100):
-                for k in range(100):
+            for j in range(128):
+                for k in range(192):
                     if img[j][k][1] >= 64 and img[j][k][2] >= 32 and img[j][k][0] == 0:
-                        enemy_pixels += 0.01 * ((50 - abs(j - 50)) + (50 - abs(k - 50)))
+                        enemy_pixels += 0.01 * ((64 - abs(j - 64)) + (96 - abs(k - 96)))
                     if img[j][k][1] >= 64 and img[j][k][2] >= 32 and (img[j][k][0] > 110 and img[j][k][0] < 120):
                         own_pixels += 1
                     if img[j][k][1] < 10 and img[j][k][2] < 80:
-                        out_of_bound_pixels += 0.01 * ((50 - abs(j - 50)) + (50 - abs(k - 50)))
+                        out_of_bound_pixels += 0.01 * ((64 - abs(j - 64)) + (96 - abs(k - 96)))
 
-            reward += 6 * min(enemy_pixels, 40) #reward agent for being near enemy
+            reward += 10 * min(enemy_pixels, 40) #reward agent for being near enemy
             #reward -= 0.25 * max(own_pixels - 50, 0) #penalize agent for building too many walls
-            reward -= 0.1 * out_of_bound_pixels #penalize the agent for being too close to arena wall
+            reward -= 2 * out_of_bound_pixels #penalize the agent for being too close to arena wall
 
             #print(reward) #for inspecting and debugging
 
