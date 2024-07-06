@@ -5,7 +5,7 @@ import torch.nn.functional as F
 class Actor(nn.Module):
     def __init__(self, init_w=3e-3):
         super(Actor, self).__init__()
-        self.conv1 = nn.Conv2d(12, 32, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
         self.conv2 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
         self.conv3 = nn.Conv2d(32, 4, kernel_size=3, padding=1)
         self.flatten = nn.Flatten()
@@ -24,7 +24,7 @@ class Actor(nn.Module):
 class Critic(nn.Module):
     def __init__(self, init_w=3e-3):
         super(Critic, self).__init__()
-        self.conv1 = nn.Conv2d(12, 32, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
         self.conv2 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
         self.conv3 = nn.Conv2d(32, 4, kernel_size=3, padding=1)
         self.flatten = nn.Flatten()

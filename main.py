@@ -157,11 +157,6 @@ while True:
 
     result_block = driver.find_element(by=By.ID, value="gm-1v1-result")
 
-    hsv_large_prev = None;
-    hsv_detail_prev = None;
-    hsv_large = None;
-    hsv_detail = None;
-
     with open(f"data/{id}/log.txt", "a") as data_file:
         data_file.write("timestep screenshot process evaluate move save\n")
 
@@ -179,15 +174,8 @@ while True:
         start = end
         img_nobar = vision.remove_bar(img)
         img_large = vision.crop_and_downsize(img_nobar, 1024, 1536, 8)
-        img_detail = vision.crop_and_downsize(img_nobar, 256, 384, 2)
-        hsv_large_prev = hsv_large
-        hsv_detail_prev = hsv_detail
         hsv_large = vision.process(img_large)
-        hsv_detail = vision.process(img_detail)
-        if i == 0:
-            hsv_large_prev = hsv_large
-            hsv_detail_prev = hsv_detail
-        data = torch.from_numpy(np.concatenate((hsv_large_prev, hsv_detail_prev, hsv_large, hsv_detail), axis=2))
+        data = torch.from_numpy(hsv_large)
         data = data.permute(2, 0, 1)
         data = data.float()
         data /= 256.0
@@ -240,9 +228,7 @@ while True:
         ping = int(fps_text[fps_text.find("ping: ") + 6:])
         max_ping = max(ping, max_ping)
         img_large = cv2.cvtColor(hsv_large, cv2.COLOR_HSV2BGR)
-        img_detail = cv2.cvtColor(hsv_detail, cv2.COLOR_HSV2BGR)
         cv2.imwrite(f"data/{id}/images/large/{i}.png", img_large)
-        cv2.imwrite(f"data/{id}/images/detail/{i}.png", img_detail)
         with open(f"data/{id}/actions.txt", "a") as data_file:
             data_file.write(' '.join(str(x) for x in action) + "\n")
         #cv2.imwrite(f"ss\{i}.png", img)
